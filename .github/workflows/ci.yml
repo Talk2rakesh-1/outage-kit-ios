@@ -1,0 +1,13 @@
+name: CI
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  build-and-test:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - run: swift test
+      - run: xcrun swift-format lint --strict -r App Sources Tests Package.swift
+      - name: Build native iOS app without signing
+        run: xcodebuild -project OutageKit.xcodeproj -scheme OutageKit -sdk iphonesimulator -configuration Release -derivedDataPath "$RUNNER_TEMP/DerivedData" CODE_SIGNING_ALLOWED=NO build
